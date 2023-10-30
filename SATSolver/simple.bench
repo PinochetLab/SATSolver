@@ -1,0 +1,14 @@
+INPUT(X)
+INPUT(Y)
+INPUT(Z)
+
+OUTPUT(B)
+
+6=NOT(Y)
+5=OR(6,Z)
+3=NOT(5)
+4=NOT(X)
+2=OR(4,Y)
+1=OR(2,3)
+B=NOT(1)
+A=AND(1,B)

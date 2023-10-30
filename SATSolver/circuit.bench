@@ -1,0 +1,17 @@
+INPUT(A)
+INPUT(B)
+INPUT(C)
+
+#lalallala
+
+OUTPUT(P5)
+OUTPUT(P)
+
+P1=AND(A,B)
+P2=NOT(A)
+P3=OR(A,P2)
+P4=AND(P1,P2,P3)
+P5=OR(A,C)
+P6=OR(C,P4,P5)
+P7=NOT(C)
+P=OR(C,P7)
