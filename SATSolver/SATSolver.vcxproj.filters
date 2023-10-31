@@ -41,5 +41,6 @@
     <None Include="simple.bench">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="README.md" />
   </ItemGroup>
 </Project>

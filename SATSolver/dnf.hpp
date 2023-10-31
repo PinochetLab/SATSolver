@@ -20,9 +20,8 @@ public:
 	bool isSolvable(const std::vector<std::shared_ptr<Clause>>& clauses) throw(std::exception) {
 		my_set ms(clauses.begin(), clauses.end());
 		std::shared_ptr<Clause> clause = clauses.size() == 1 ? clauses[0] : std::make_shared<And>(ms);
-		std::cout << "Start: " << clause->to_string() << std::endl << std::endl;
 		std::shared_ptr<Clause> nClause = simplify(clause);
-		std::cout << std::endl << "Final: " << nClause->to_string() << std::endl << std::endl;
+		//std::cout << nClause->to_string() << '\n';
 		if (std::shared_ptr<FClause> f = std::dynamic_pointer_cast<FClause>(nClause)) {
 			return false;
 		}
@@ -111,6 +110,7 @@ public:
 
 	std::shared_ptr<Clause> simplifyAndClause(std::shared_ptr<And> andClause) throw(std::exception) {
 		my_set cs;
+		bool containsOr = false;
 		for (std::shared_ptr<Clause> cl : andClause->ands) {
 			std::shared_ptr<Clause> c = simplify(cl);
 			if (std::dynamic_pointer_cast<FClause>(c)) {
@@ -124,6 +124,10 @@ public:
 				cs.insert(ms.begin(), ms.end());
 			}
 			else if (std::shared_ptr<Or> orC = std::dynamic_pointer_cast<Or>(c)) {
+				cs.insert(c);
+				containsOr = true;
+			}
+			/*else if (std::shared_ptr<Or> orC = std::dynamic_pointer_cast<Or>(c)) {
 				my_set ands(andClause->ands);
 				ands.erase(c);
 				std::shared_ptr<Clause> other = simplify(std::shared_ptr<Clause>(new And(ands)));
@@ -142,7 +146,7 @@ public:
 					}
 				}
 				return std::make_shared<Or>(res);
-			}
+			}*/
 			else {
 				cs.insert(c);
 			}
@@ -152,17 +156,54 @@ public:
 			if (cs.contains(invert(c))) return std::make_shared<FClause>();
 		}
 
+		if (cs.size() > 1 && containsOr) {
+			size_t half = cs.size() / 2;
+			auto it = cs.begin();
+			for (size_t i = 0; i < half; i++) it++;
+			my_set part1(cs.begin(), it);
+			my_set part2(it, cs.end());
+			std::shared_ptr<Clause> p1 = simplify(std::make_shared<And>(part1));
+			std::shared_ptr<Clause> p2 = simplify(std::make_shared<And>(part2));
+			my_set ors1;
+			my_set ors2;
+			my_set ors;
+			if (std::shared_ptr<Or> p1Or = std::dynamic_pointer_cast<Or>(p1)) {
+				ors1 = std::move(p1Or->ors);
+			}
+			else {
+				ors1 = { p1 };
+			}
+
+			if (std::shared_ptr<Or> p2Or = std::dynamic_pointer_cast<Or>(p2)) {
+				ors2 = std::move(p2Or->ors);
+			}
+			else {
+				ors2 = { p2 };
+			}
+			for (std::shared_ptr<Clause> or1 : ors1) {
+				for (std::shared_ptr<Clause> or2 : ors2) {
+					ors.insert(simplify(std::make_shared<And>(my_set{ or1, or2 })));
+				}
+			}
+			return simplify(std::make_shared<Or>(ors));
+		}
+
 		if (cs.empty()) return std::make_shared<TClause>();
 		if (cs.size() == 1) return *cs.begin();
+
 		return std::make_shared<And>(cs);
 	}
 
 	std::shared_ptr<Clause> simplifyOrClause(std::shared_ptr<Or> orClause) throw(std::exception) {
 		my_set cs;
+		bool containsFalse = false;
 		for (std::shared_ptr<Clause> cl : orClause->ors) {
 			std::shared_ptr<Clause> c = simplify(cl);
 			if (std::dynamic_pointer_cast<TClause>(c)) return std::make_shared<TClause>();
-			if (std::dynamic_pointer_cast<FClause>(c)) continue;
+			if (std::dynamic_pointer_cast<FClause>(c)) {
+				containsFalse = true;
+				continue;
+			}
 			if (std::shared_ptr<Or> orC = std::dynamic_pointer_cast<Or>(c)) {
 				my_set ms = orC->ors;
 				cs.insert(ms.begin(), ms.end());
@@ -176,7 +217,14 @@ public:
 			if (cs.contains(invert(c))) return std::make_shared<TClause>();
 		}
 
-		if (cs.empty()) return std::make_shared<TClause>();
+		if (cs.empty()) {
+			if (containsFalse) {
+				return std::make_shared<FClause>();
+			}
+			else {
+				return std::make_shared<TClause>();
+			}
+		}
 		if (cs.size() == 1) return *cs.begin();
 		return std::make_shared<Or>(cs);
 	}
