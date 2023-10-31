@@ -30,9 +30,9 @@ void fileWork(const std::string path) {
 int main() {
 	//fileWork("benchs_for_test_task");
 	//std::cout << isSolvable("simple.bench");
-	std::cout << isSolvable("benchs_for_test_task/trVlog_4.bench");
+	//std::cout << isSolvable("benchs_for_test_task/trVlog_4.bench");
 	//std::cout << isSolvable("benchs_for_test_task/trVlog_2.bench");
 	//std::cout << isSolvable("benchs_for_test_task/trVn_2.bench");
-	//std::cout << isSolvable("benchs_for_test_task/5_6.bench");
+	std::cout << isSolvable("benchs_for_test_task/miter_identity_php_3_4.bench");
 	return 0;
 }

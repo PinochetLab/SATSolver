@@ -43,4 +43,7 @@
     </None>
     <None Include="README.md" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="results.txt" />
+  </ItemGroup>
 </Project>

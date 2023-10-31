@@ -9,6 +9,7 @@ private:
 	std::unordered_map<std::string, std::shared_ptr<Clause>> clauses;
 
 	std::shared_ptr<Clause> parse(const std::string& name) {
+		std::cout << name << std::endl;
 		if (clauses.contains(name)) return clauses.at(name);
 		std::string formula = bench->getFormulas().at(name);
  		size_t start = formula.find('(');
