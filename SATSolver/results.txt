@@ -1,6 +1,141 @@
-5_6.bench - UNSAT - 10 минут
-trVlog_2.bench - SAT - 1 секунда
-trVn_2.bench - SAT - 1 секунда
-logVn_2.bench - UNSAT - 1 секунда
+benchs_for_test_task/5_6.bench:  UNSAT
+time(sec): {parse: 0.018, to_cnf: 0.021, solve: 0.162, total: 0.201}
 
-Остальное долго (больше 15 минут), результатов не дождался
+benchs_for_test_task/12_13_1.bench:  UNSAT
+time(sec): {parse: 0.042, to_cnf: 0.163, solve: 9.579, total: 9.784}
+
+benchs_for_test_task/16_4.bench:  UNSAT
+time(sec): {parse: 0.02, to_cnf: 0.015, solve: 0.17, total: 0.205}
+
+benchs_for_test_task/72_4.bench:  UNSAT
+time(sec): {parse: 0.063, to_cnf: 0.156, solve: 3.438, total: 3.657}
+
+benchs_for_test_task/BvP_4_3-aigmiter.bench:  UNSAT
+time(sec): {parse: 0.056, to_cnf: 0.127, solve: 0.486, total: 0.669}
+
+benchs_for_test_task/BvP_4_4-aigmiter.bench:  UNSAT
+time(sec): {parse: 0.079, to_cnf: 0.256, solve: 0.87, total: 1.205}
+
+benchs_for_test_task/BvS_3_3-aigmiter.bench:  UNSAT
+time(sec): {parse: 0.041, to_cnf: 0.055, solve: 0.23, total: 0.326}
+
+benchs_for_test_task/logVn_2.bench:  UNSAT
+time(sec): {parse: 0.01, to_cnf: 0.015, solve: 0.07, total: 0.095}
+
+benchs_for_test_task/logVn_4.bench:  UNSAT
+time(sec): {parse: 0.019, to_cnf: 0.092, solve: 0.315, total: 0.426}
+
+benchs_for_test_task/logVn_6.bench:  UNSAT
+time(sec): {parse: 0.032, to_cnf: 0.286, solve: 1.233, total: 1.551}
+
+benchs_for_test_task/logVn_8.bench:  UNSAT
+time(sec): {parse: 0.066, to_cnf: 0.708, solve: 16.851, total: 17.625}
+
+benchs_for_test_task/miter_3.bench:  UNSAT
+time(sec): {parse: 0.141, to_cnf: 0.074, solve: 0.243, total: 0.458}
+
+benchs_for_test_task/miter_6.bench:  SAT
+time(sec): {parse: 0.111, to_cnf: 0.07, solve: 0.135, total: 0.316}
+
+benchs_for_test_task/miter_8.bench:  UNSAT
+time(sec): {parse: 0.155, to_cnf: 0.081, solve: 0.236, total: 0.472}
+
+benchs_for_test_task/miter_16.bench:  SAT
+time(sec): {parse: 0.13, to_cnf: 0.048, solve: 0.126, total: 0.304}
+
+benchs_for_test_task/miter_26.bench:  SAT
+time(sec): {parse: 0.114, to_cnf: 0.04, solve: 0.133, total: 0.287}
+
+benchs_for_test_task/miter_33.bench:  UNSAT
+time(sec): {parse: 0.121, to_cnf: 0.083, solve: 0.208, total: 0.412}
+
+benchs_for_test_task/miter_46.bench:  SAT
+time(sec): {parse: 0.141, to_cnf: 0.041, solve: 0.131, total: 0.313}
+
+benchs_for_test_task/miter_68.bench:  UNSAT
+time(sec): {parse: 0.126, to_cnf: 0.063, solve: 0.209, total: 0.398}
+
+benchs_for_test_task/miter_85.bench:  UNSAT
+time(sec): {parse: 0.383, to_cnf: 0.731, solve: 1.101, total: 2.215}
+
+benchs_for_test_task/miter_91.bench:  UNSAT
+time(sec): {parse: 0.355, to_cnf: 0.775, solve: 1.267, total: 2.397}
+
+benchs_for_test_task/miter_129.bench:  UNSAT
+time(sec): {parse: 0.316, to_cnf: 0.745, solve: 1.133, total: 2.194}
+
+benchs_for_test_task/miter_174.bench:  UNSAT
+time(sec): {parse: 0.331, to_cnf: 0.74, solve: 1.114, total: 2.185}
+
+benchs_for_test_task/miter_188.bench:  SAT
+time(sec): {parse: 0.112, to_cnf: 0.045, solve: 0.127, total: 0.284}
+
+benchs_for_test_task/miter_197.bench:  UNSAT
+time(sec): {parse: 0.381, to_cnf: 0.727, solve: 1.202, total: 2.31}
+
+benchs_for_test_task/miter_identity_php_3_4.bench:  UNSAT
+time(sec): {parse: 0.02, to_cnf: 0.013, solve: 0.046, total: 0.079}
+
+benchs_for_test_task/miter_identity_php_6_19_3.bench:  UNSAT
+time(sec): {parse: 0.057, to_cnf: 0.154, solve: 6.448, total: 6.659}
+
+benchs_for_test_task/miter_identity_php_8_9.bench:  UNSAT
+time(sec): {parse: 0.034, to_cnf: 0.074, solve: 0.252, total: 0.36}
+
+benchs_for_test_task/miter_identity_php_10_31_3.bench:  UNSAT
+time(sec): {parse: 0.152, to_cnf: 0.637, solve: 21.817, total: 22.606}
+
+benchs_for_test_task/miter_identity_php_11_23_2.bench:  UNSAT
+time(sec): {parse: 0.107, to_cnf: 0.393, solve: 20.917, total: 21.417}
+
+benchs_for_test_task/miter_identity_php_12_13_1.bench:  UNSAT
+time(sec): {parse: 0.075, to_cnf: 0.192, solve: 5.771, total: 6.038}
+
+benchs_for_test_task/miter_identity_php_13_14_1.bench:  UNSAT
+time(sec): {parse: 0.07, to_cnf: 0.226, solve: 8.622, total: 8.918}
+
+benchs_for_test_task/miter_identity_php_14_15_1.bench:  UNSAT
+time(sec): {parse: 0.138, to_cnf: 0.537, solve: 23.374, total: 24.049}
+
+benchs_for_test_task/miter_identity_php_23_24_1.bench:  UNSAT
+time(sec): {parse: 0.656, to_cnf: 1.344, solve: 30.623, total: 32.623}
+
+benchs_for_test_task/miter_identity_php_24_25_1.bench:  UNSAT
+time(sec): {parse: 0.461, to_cnf: 1.604, solve: 57.199, total: 59.264}
+
+benchs_for_test_task/paley_13.bench:  UNSAT
+time(sec): {parse: 0.029, to_cnf: 0.068, solve: 6.055, total: 6.152}
+
+benchs_for_test_task/PvS_4_3-aigmiter.bench:  UNSAT
+time(sec): {parse: 0.047, to_cnf: 0.096, solve: 0.448, total: 0.591}
+
+benchs_for_test_task/reg_11_6.bench:  UNSAT
+time(sec): {parse: 0.026, to_cnf: 0.056, solve: 1.234, total: 1.316}
+
+benchs_for_test_task/trVlog_2.bench:  UNSAT
+time(sec): {parse: 0.007, to_cnf: 0.007, solve: 0.036, total: 0.05}
+
+benchs_for_test_task/trVlog_4.bench:  UNSAT
+time(sec): {parse: 0.023, to_cnf: 0.04, solve: 0.118, total: 0.181}
+
+benchs_for_test_task/trVlog_6.bench:  UNSAT
+time(sec): {parse: 0.026, to_cnf: 0.111, solve: 0.632, total: 0.769}
+
+benchs_for_test_task/trVlog_8.bench:  UNSAT
+time(sec): {parse: 0.047, to_cnf: 0.26, solve: 7.944, total: 8.251}
+
+benchs_for_test_task/trVn_2.bench:  UNSAT
+time(sec): {parse: 0.009, to_cnf: 0.007, solve: 0.037, total: 0.053}
+
+benchs_for_test_task/trVn_4.bench:  UNSAT
+time(sec): {parse: 0.016, to_cnf: 0.041, solve: 0.147, total: 0.204}
+
+benchs_for_test_task/trVn_6.bench:  UNSAT
+time(sec): {parse: 0.026, to_cnf: 0.104, solve: 0.587, total: 0.717}
+
+benchs_for_test_task/trVn_8.bench:  UNSAT
+time(sec): {parse: 0.057, to_cnf: 0.245, solve: 6.454, total: 6.756}
+
+benchs_for_test_task/trVn_10.bench:  UNSAT
+time(sec): {parse: 0.096, to_cnf: 0.509, solve: 120.07, total: 120.675}
+

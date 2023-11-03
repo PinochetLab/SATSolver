@@ -5,36 +5,76 @@
 #include <unordered_map>
 
 struct Clause {
-protected:
-	std::string s;
 public:
-	std::string to_string() {
-		return s;
-	}
-
+	size_t count;
 	virtual bool operator==(const Clause& other) const {
 		return true;
 	}
+
+	friend std::ostream& operator << (std::ostream& os, const Clause& clause) {
+		clause.print(os);
+		return os;
+	}
+
+	virtual void print(std::ostream& os) const = 0;
+
+	virtual int hash() const = 0;
+
+	virtual std::string prettyString() const = 0;
+
+	virtual std::string opString() const = 0;
 };
 
-inline auto myHash = [](std::shared_ptr<Clause> c) {return std::hash<std::string>{}(c->to_string()); };
-inline auto myEqual = [](const std::shared_ptr<Clause>& c1, const std::shared_ptr<Clause>& c2) {return c1->to_string() == c2->to_string(); };
+template<class T>
+using my_ptr = std::shared_ptr<T>;
 
-using my_set = std::unordered_set<std::shared_ptr<Clause>, 
-	decltype(myHash),
-	decltype(myEqual)>;
+using clause_ptr = my_ptr<Clause>;
+
+using my_set = std::unordered_set<clause_ptr>;
 
 struct TClause : public Clause {
 public:
 	TClause() {
-		s = "True";
+		count = 1; 
+	}
+
+	void print(std::ostream& os) const override {
+		os << "True";
+	}
+
+	int hash() const override {
+		return 1;
+	}
+
+	std::string prettyString() const override {
+		return opString();
+	}
+
+	std::string opString() const override {
+		return "True";
 	}
 };
 
 struct FClause : public Clause {
 public:
 	FClause() {
-		s = "False";
+		count = 1;
+	}
+
+	void print(std::ostream& os) const override {
+		os << "False";
+	}
+
+	int hash() const override {
+		return 2;
+	}
+
+	std::string prettyString() const override {
+		return opString();
+	}
+
+	std::string opString() const override {
+		return "False";
 	}
 };
 
@@ -43,43 +83,105 @@ public:
 	std::string lit;
 
 	Lit(const std::string& lit) : lit(lit) {
-		s = lit;
+		count = 1;
+	}
+
+	void print(std::ostream& os) const override {
+		os << lit;
+	}
+
+	int hash() const override {
+		std::hash<std::string> h;
+		return h(lit) + 3;
+	}
+
+	std::string prettyString() const override {
+		return opString();
+	}
+
+	std::string opString() const override {
+		return lit;
 	}
 };
 
 struct Not : public Clause {
 public:
-	std::shared_ptr<Clause> child;
+	clause_ptr child;
 
-	Not(std::shared_ptr<Clause> child) : child(child) {
-		s = "Not(" + child->to_string() + ")";
+	Not(clause_ptr child) : child(child) {
+		count = 1 + child->count;
+	}
+
+	void print(std::ostream& os) const override {
+		os << "Not(" << *child << ")";
+	}
+
+	int hash() const override {
+		std::hash<clause_ptr> h;
+		return h(child) << 16 + 5;
+	}
+
+	std::string prettyString() const override {
+		return "Not(" + child->opString() + ")";
+	}
+
+	std::string opString() const override {
+		return "Not";
 	}
 };
 
 
 struct Or : public Clause {
 public:
-	my_set ors;
+	clause_ptr left;
+	clause_ptr right;
 
-	Or(my_set ors) : ors(ors) {
-		s = "Or(";
-		for (auto o : ors) {
-			s += (o->to_string() + ",");
-		}
-		s = s.substr(0, s.length() - 1) + ')';
+	Or(clause_ptr left, clause_ptr right) : left(left), right(right) {
+		count = 1 + left->count + right->count;
+	}
+
+	void print(std::ostream& os) const override {
+		os << "Or(" << *left << ", " << *right << ")";
+	}
+
+	int hash() const override {
+		std::hash<clause_ptr> h;
+		return h(left) << 32 + h(right) << 16 + 7;
+	}
+
+	std::string prettyString() const override {
+		return "Or(" + left->opString() + ", " + right->opString() + ")";
+	}
+
+	std::string opString() const override {
+		return "Or";
 	}
 };
 
 
 struct And : public Clause {
 public:
-	my_set ands;
+	clause_ptr left;
+	clause_ptr right;
 
-	And(my_set ands) : ands(ands) {
-		s = "And(";
-		for (auto o : ands) {
-			s += (o->to_string() + ",");
-		}
-		s = s.substr(0, s.length() - 1) + ')';
+	And(clause_ptr left, clause_ptr right) : left(left), right(right) {
+		count = 1 + left->count + right->count;
+	}
+
+	void print(std::ostream& os) const override {
+		os << "And(" << *left << ", " << *right << ")";
+	}
+
+	int hash() const override {
+		std::hash<clause_ptr> h;
+		return h(left) << 16 + h(right) << 8 + 11;
+	}
+
+	std::string prettyString() const override {
+		return "And(" + left->opString() + ", " + right->opString() + ")";
+	}
+
+	std::string opString() const override {
+		return "And";
 	}
 };

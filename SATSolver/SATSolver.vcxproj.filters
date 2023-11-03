@@ -18,6 +18,9 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="2Sat.hpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="clauses.hpp">
@@ -29,7 +32,10 @@
     <ClInclude Include="parser.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="dnf.hpp">
+    <ClInclude Include="solver.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cnf.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -42,8 +48,14 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="README.md" />
+    <None Include="$(MSBuildThisFileDirectory)..\runtimes\win-x64\native\libz3.dll" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="results.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="icon.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

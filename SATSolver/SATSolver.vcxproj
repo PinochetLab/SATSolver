@@ -104,14 +104,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Boost\vcpkg\packages\boost-yap_x64-windows\share\boost-yap;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Astat\source\repos\SatSolver\SATSolver\z3-4.12.2-x64-win\include;C:\Boost\vcpkg\packages\boost-yap_x64-windows\share\boost-yap;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>
-      </AdditionalDependencies>
+      <AdditionalDependencies>libz3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\Astat\source\repos\SatSolver\SATSolver\z3-4.12.2-x64-win\bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -122,6 +122,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>C:\Users\Astat\source\repos\SatSolver\SATSolver\z3-4.12.2-x64-win\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -131,12 +133,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="2Sat.hpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bench.hpp" />
     <ClInclude Include="clauses.hpp" />
-    <ClInclude Include="dnf.hpp" />
+    <ClInclude Include="cnf.hpp" />
+    <ClInclude Include="solver.hpp" />
     <ClInclude Include="parser.hpp" />
   </ItemGroup>
   <ItemGroup>
@@ -148,14 +152,19 @@
   <ItemGroup>
     <Text Include="results.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="icon.jpg" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\packages\boost.1.83.0\build\boost.targets" Condition="Exists('..\packages\boost.1.83.0\build\boost.targets')" />
+    <Import Project="..\packages\Microsoft.Z3.4.12.2\build\Microsoft.Z3.targets" Condition="Exists('..\packages\Microsoft.Z3.4.12.2\build\Microsoft.Z3.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\boost.1.83.0\build\boost.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost.1.83.0\build\boost.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.Z3.4.12.2\build\Microsoft.Z3.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Z3.4.12.2\build\Microsoft.Z3.targets'))" />
   </Target>
 </Project>
