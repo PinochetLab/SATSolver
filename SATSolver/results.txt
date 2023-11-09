@@ -139,3 +139,11 @@ time(sec): {parse: 0.057, to_cnf: 0.245, solve: 6.454, total: 6.756}
 benchs_for_test_task/trVn_10.bench:  UNSAT
 time(sec): {parse: 0.096, to_cnf: 0.509, solve: 120.07, total: 120.675}
 
+new: Время увеличилось(
+
+benchs_for_test_task/logVn_2.bench:  UNSAT
+time(sec): {parse: 0.005, to_cnf: 0.016, solve: 2.833, total: 2.854}
+
+benchs_for_test_task/5_6.bench:  UNSAT
+time(sec): {parse: 0.011, to_cnf: 0.012, solve: 4.493, total: 4.516}
+

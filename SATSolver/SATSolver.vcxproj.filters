@@ -18,15 +18,12 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="2Sat.hpp">
+    <ClCompile Include="sat2.hpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="clauses.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="bench.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="parser.hpp">

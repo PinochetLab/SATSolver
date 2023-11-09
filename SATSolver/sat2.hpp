@@ -6,21 +6,26 @@
 
 #include "cnf.hpp"
 
+using sat2_answer_t = std::unordered_map<std::string, bool>;
+
 class Sat2 {
-public:
+private:
 	int n;
 	std::vector<std::vector<int>> g, gt;
 	std::vector<bool> used;
 	std::vector<int> order, comp;
 
+	sat2_answer_t answer;
 	std::unordered_map<std::string, int> indices;
+	std::vector<std::string> names;
 	std::unordered_map<int, std::vector<int>> ns;
 	int index = 0;
 
 	size_t get_index(const Elem& e) {
-		return 2 * indices[e.name] + e.inverted;
+		return 2 * indices[e.name] + e.inv;
 	}
 
+public:
 	Sat2(const std::vector<d_t>& cnf) {
 		std::set<std::string> names;
 		for (const auto& d : cnf) {
@@ -37,6 +42,8 @@ public:
 		order = std::vector<int>();
 		comp = std::vector<int>(n, -1);
 
+		this->names = std::vector<std::string>(names.begin(), names.end());
+
 		for (const auto& name : names) {
 			indices[name] = index;
 			index++;
@@ -46,11 +53,11 @@ public:
 			std::vector<Elem> v(d.begin(), d.end());
 			Elem e1 = v[0];
 			Elem e2 = v[1];
-			g[get_index(e1.inv())].push_back(get_index(e2));
-			g[get_index(e2.inv())].push_back(get_index(e1));
+			g[get_index(e1.inverted())].push_back(get_index(e2));
+			g[get_index(e2.inverted())].push_back(get_index(e1));
 
-			gt[get_index(e2)].push_back(get_index(e1.inv()));
-			gt[get_index(e1)].push_back(get_index(e2.inv()));
+			gt[get_index(e2)].push_back(get_index(e1.inverted()));
+			gt[get_index(e1)].push_back(get_index(e2.inverted()));
 		}
 	}
 
@@ -88,10 +95,18 @@ public:
 		}
 		for (int i = 0; i < n; ++i) {
 			if (comp[i] == comp[i ^ 1]) {
-				std::cout << "comp: " << comp[i] << std::endl;
 				return false;
 			}
 		}
+		for (int i = 0; i < n; ++i) {
+			if (comp[i] > comp[i ^ 1]) {
+				answer.insert_or_assign(names[i / 2], i % 2);
+			}
+		}
 		return true;
+	}
+
+	sat2_answer_t getAnswer() {
+		return answer;
 	}
 };

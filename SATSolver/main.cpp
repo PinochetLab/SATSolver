@@ -1,71 +1,53 @@
 #include <iostream>
 #include <filesystem>
+#include <fstream>
 #include <exception>
 #include <chrono>
 #include <functional>
 #include <z3++.h>
 
 #include "clauses.hpp"
-#include "bench.hpp"
 #include "parser.hpp"
 #include "solver.hpp"
-#include "2Sat.hpp"
+#include "sat2.hpp"
 
-
-//void fileWork(const std::string path) {
-//	for (const auto& entry : std::filesystem::directory_iterator(path)) {
-//		std::string fileName(entry.path().string());
-//		try {
-//			isSolvable(fileName);
-//		}
-//		catch (std::exception& e) {
-//			std::cout << "bad alloc" << std::endl;
-//		}
-//	}
-//}
-
-
-std::unordered_map<std::string, std::function<bool()>> values;
-
-bool getValue(const std::string& name) {
-	if (auto it = values.find(name); it != values.end()) {
-		return it->second();
-	}
-	return false;
-}
-
-
-
-bool is_true(const d_t& d) {
+bool isControversy(const d_t& d) {
 	for (const auto& e : d) {
-		if (d.contains(e.inv())) {
+
+		// if contains inverted element
+		if (d.contains(e.inverted())) {
 			return true;
 		}
 	}
 	return false;
 }
 
-void set_var(std::vector<d_t>& cnf, const Elem& elem) {
-	values[elem.name] = [elem]() {return !elem.inverted; };
+void substitute(std::vector<d_t>& cnf, const Elem& elem) {
 	size_t s = cnf.size();
 	for (size_t i = 0; i < s; i++) {
 		size_t r_i = s - i - 1;
+
+		// if contains element, this disjunction is true, we can remove it
 		if (cnf[r_i].contains(elem)) {
 			cnf.erase(cnf.begin() + r_i);
 		}
-		else if (cnf[r_i].contains(elem.inv())) {
-			cnf[r_i].erase(elem.inv());
+
+		// if contains inverted element, we can remove that element
+		else if (cnf[r_i].contains(elem.inverted())) {
+			cnf[r_i].erase(elem.inverted());
 		}
 	}
 }
 
-void set_all_variables(std::vector<d_t>& cnf) {
+void substituteObviusVariables(std::vector<d_t>& cnf) {
 	while (true) {
 		bool var_found = false;
 		for (size_t i = 0; i < cnf.size(); i++) {
+
+			// if dizjunction contains only one item, we can substitute it
 			if (cnf[i].size() == 1) {
 				Elem e = *cnf[i].begin();
-				set_var(cnf, e);
+				substitute(cnf, e);
 				var_found = true;
 			}
 		}
@@ -73,167 +55,26 @@ void set_all_variables(std::vector<d_t>& cnf) {
 	}
 }
 
-void remove_true_ds(std::vector<d_t>& cnf) {
+void removeControversies(cnf_v& cnf) {
 	size_t s = cnf.size();
-	
 	for (size_t i = 0; i < s; i++) {
-		//std::cout << "i = " << i << std::endl;
 		size_t r_i = s - i - 1;
-		if (is_true(cnf[r_i])) {
+		if (isControversy(cnf[r_i])) {
 			cnf.erase(std::next(cnf.begin(), r_i));
 		}
 	}
 }
 
-bool satisfiableCnf(const cnf_t& cnf, const std::unordered_map<std::string, bool>& m) {
-	/*for (const auto& [k, v] : m) {
-		std::cout << (v ? "" : "!") << k << "  ";
-	}*/
-	//std::cout << std::endl;
+bool containsEmpty(const cnf_v& cnf) {
 	for (const auto& d : cnf) {
-		bool isTrue = false;
-		for (const auto& e : d) {
-			if (m.contains(e.name)) {
-				bool b = m.at(e.name);
-				if (b == !e.inverted) {
-					isTrue = true;
-					break;
-				}
-			}
-			else {
-				std::unordered_map<std::string, bool> m0(m);
-				std::unordered_map<std::string, bool> m1(m);
-				m0.insert({ e.name, false });
-				m1.insert({ e.name, true });
-				return satisfiableCnf(cnf, m1) || satisfiableCnf(cnf, m0);
-			}
-		}
-		if (!isTrue) return false;
-	}
-	return true;
-}
-
-bool satisfiable(std::vector<d_t>& v) {
-
-	remove_true_ds(v);
-	set_all_variables(v);
-	cnf_t cnf(v.begin(), v.end());
-	return satisfiableCnf(cnf, {});
-}
-
-bool resolve(const d_t& d1, const d_t& d2, d_t& d, Elem& elem) {
-	for (const auto& e : d1) {
-		if (d2.contains(e.inv())) {
-			//std::cout << "yes!" << std::endl;
-			//std::cout << d1.size() << " - " << d2.size() << std::endl;
-			d = d_t(d1);
-			d.insert(d2.begin(), d2.end());
-			d.erase(e);
-			d.erase(e.inv());
-			elem = e;
-			//std::cout << "end!" << std::endl;
-			return true;
-		}
+		if (d.empty()) return true;
 	}
 	return false;
 }
 
-//void try_solve(std::vector<d_t>& cnf) {
-//	remove_true_ds(cnf);
-//	set_all_variables(cnf);
-//	z3::context context;
-//	z3::expr_vector v(context);
-//	z3::solver solver(context);
-//	for (const d_t& d : cnf) {
-//		if (d.size() == 2) {
-//			cnf2.push_back(d);
-//		}
-//	}
-//	std::cout << cnf.size() << "/" << cnf2.size();
-//
-//	z3::context context;
-//	z3::expr_vector v(context);
-//	z3::solver solver(context);
-//}
-
-bool is_solvable(std::vector<d_t>& cnf) {
-	while (true) {
-		//std::cout << cnf.size() << std::endl;
-		remove_true_ds(cnf);
-		
-		set_all_variables(cnf);
-		
-
-		for (const auto& d : cnf) {
-			if (d.empty()) {
-				return false;
-			}
-		}
-
-		size_t i = 0;
-		for (const auto& d : cnf) {
-			if (d.size() > 2) {
-				i++;
-			}
-		}
-
-		//std::cout << i << "/" << cnf.size() << std::endl;
-
-		bool resolution_applied = false;
-		for (size_t i = 0; i < cnf.size(); i++) {
-			//std::cout << "i = " << i << std::endl;
-			for (size_t j = i + 1; j < cnf.size(); j++) {
-				//std::cout << "j = " << j << std::endl;
-				d_t new_d;
-				Elem e("");
-				if (resolve(cnf[i], cnf[j], new_d, e)) {
-					std::cout << "e: " << e.name << std::endl;
-					bool unique = true;
-					for (size_t k = 0; k < cnf.size(); k++) {
-						if (k == i || k == j) continue;
-						if (cnf[k].contains(e) || cnf[k].contains(e.inv())) {
-							std::cout << "i: " << i << "; j: " << j << "; k: " << k << std::endl;
-							unique = false;
-							break;
-						}
-					}
-					if (!unique) continue;
-					std::cout << "i: " << i << " j: " << j << std::endl;
-					resolution_applied = true;
-					cnf.erase(cnf.begin() + j);
-					cnf.erase(cnf.begin() + i);
-					cnf.push_back(new_d);
-					break;
-				}
-			}
-			if (resolution_applied) {
-				break;
-			}
-		}
-		if (!resolution_applied) {
-			break;
-		}
-	}
-	//printV(cnf);
-
-	return true;
-}
-
-bool isSolvable(const cnf_t& cnf) {
-	std::vector<d_t> v(cnf.begin(), cnf.end());
-	return is_solvable(v);
-}
-
-bool isSolvable(const std::string& path) {
-	clause_ptr clause = Parser().parse(path);
-	//std::cout << clause->count << std::endl;
-	Solver solver = Solver();
-	clause = solver.simplify(clause);
-	if (std::dynamic_pointer_cast<TClause>(clause)) return true;
-	if (std::dynamic_pointer_cast<FClause>(clause)) return false;
-	cnf_t cnf = solver.to_cnf(clause);
-	//return isSolvable(cnf);
-	return true;
+void simplify(cnf_v& cnf) {
+	substituteObviusVariables(cnf);
+	removeControversies(cnf);
 }
 
 double countTime(clock_t& last) {
@@ -244,103 +85,106 @@ double countTime(clock_t& last) {
 }
 
 z3::solver solveZ3(const std::vector<d_t>& vec, z3::context& context) {
-	z3::expr_vector v(context);
+	z3::expr_vector cnfZ3(context);
 	z3::solver solver(context);
 	for (const auto& d : vec) {
-		z3::expr_vector diz(context);
+		z3::expr_vector disjunctionZ3(context);
 		for (const auto& e : d) {
 			z3::expr expr = context.bool_const(e.name.c_str());
-			if (e.inverted) diz.push_back(!expr);
-			else diz.push_back(expr);
+			if (e.inv) disjunctionZ3.push_back(!expr);
+			else disjunctionZ3.push_back(expr);
 		}
-		v.push_back(z3::mk_or(diz));
+		cnfZ3.push_back(z3::mk_or(disjunctionZ3));
 	}
-	solver.add(z3::mk_and(v));
+	solver.add(z3::mk_and(cnfZ3));
 	return solver;
 }
 
-bool is_sat(std::vector<d_t>& cnf, z3::context& context) {
-	//remove_true_ds(cnf);
-	//set_all_variables(cnf);
-	//printV(cnf);
-	std::vector<d_t> sat2;
+bool is_sat(cnf_v& cnf, z3::context& context) {
+	// if contains empty disjunction
+	if (containsEmpty(cnf)) return false;
+	
+	// collecting 2-disjunctions
+	cnf_v cnf2; 
 	for (const auto& d : cnf) {
-		if (d.size() == 2) sat2.push_back(d);
+		if (d.size() == 2) cnf2.push_back(d);
 	}
-	if (sat2.size() > 10) {
-		bool solvable2 = Sat2(sat2).check();
-		if (!solvable2) {
-			std::cout << "2SAT Part is not satisfiable." << std::endl;
-			return false;
+
+	// solve with Z3
+	if (cnf2.empty()) {
+		return solveZ3(cnf, context).check();
+	}
+	Sat2 sat2 = Sat2(cnf2);
+	bool sat = sat2.check();
+
+	// our 3sat is 2sat
+	if (cnf2.size() == cnf.size()) {
+		return sat;
+	}
+	if (!sat) {
+		return false;
+	}
+	sat2_answer_t answer = sat2.getAnswer();
+	bool simplified = false;
+	for (auto [name, value] : answer) {
+		cnf_v altCnf(cnf2);
+
+		// substitute invert value for check if this value is neccassary
+		substitute(altCnf, Elem(name, value));
+		simplify(altCnf);
+
+		// if new 2sat is unsat 
+		if (containsEmpty(altCnf) || !Sat2(altCnf).check()) {
+			simplified = true;
+
+			//substitute neccessary value to cnf
+			substitute(cnf, Elem(name, !value));
+			simplify(cnf);
 		}
 	}
-	return solveZ3(cnf, context).check();
+
+	// if no neccessary vars
+	if (!simplified) {
+		return solveZ3(cnf, context).check();
+	}
+	return is_sat(cnf, context);
 }
 
-void doOne(const std::string& path) {
+void solveBench(const std::string& path) {
 	clock_t start = clock();
-	
+
 	clause_ptr clause = Parser().parse(path);
-	
+
 	double parsingTime = countTime(start);
-	std::cout << "parsing finished in " << parsingTime << " seconds" << std::endl;
 
 	Solver solver = Solver();
-	//clause = solver.simplify(clause);
 
-	//double simplifyTime = countTime(start);
+	cnf_s cnf = solver.to_cnf_fast(clause);
+	
+	double toCnfTime = countTime(start);
 
-	//std::cout << "simplifying finished in " << simplifyTime << " seconds" << std::endl;
+	std::vector<d_t> cnfAsVec(cnf.begin(), cnf.end());
 
-	double cnfTime = 0;
-	double solveTime = 0;
+	substituteObviusVariables(cnfAsVec);
 
-	bool solvable;
-	if (std::dynamic_pointer_cast<TClause>(clause)) {
-		solvable = true;
-	}
-	else if (std::dynamic_pointer_cast<FClause>(clause)) {
-		std::cout << "cnfization finished in " << cnfTime << " seconds" << std::endl;
-		std::cout << "solving finished in " << solveTime << " seconds" << std::endl;
-		solvable = false;
-	}
-	else {
-		cnf_t cnf = solver.to_cnf_fast(clause);
-		//cnf_t cnf = solver.to_cnf(clause);
-		cnfTime = countTime(start);
-
-		std::cout << "cnfization finished in " << cnfTime << " seconds" << std::endl;
-
-		std::vector<d_t> vec(cnf.begin(), cnf.end());
-		set_all_variables(vec);
-		remove_true_ds(vec);
+	removeControversies(cnfAsVec);
 		
-		z3::context context;
-		//solvable = solveZ3(vec, context).check();
-		solvable = is_sat(vec, context);
-		//std::cout << solver.get_model() << std::endl;
-		//solvable = is_solvable(vec);
+	z3::context context;
 
-		//std::cout << "satisfiable: " << s << "; solvable: " << solvable << std::endl;
+	bool solvable = is_sat(cnfAsVec, context);
+	
+	double solveTime = countTime(start);
 
-		solveTime = countTime(start);
-
-		std::cout << "solving finished in " << solveTime << " seconds" << std::endl;
-	}
-	//return isSolvable(cnf);
-
-	std::ifstream in = std::ifstream("results.txt");
-	std::ostringstream sstr;
-	sstr << in.rdbuf();
+	std::ifstream resultFile = std::ifstream("results.txt");
+	std::ostringstream old;
+	old << resultFile.rdbuf();
 	std::ofstream os = std::ofstream("results.txt");
-	os << sstr.str() << path << ":  " << (solvable ? "SAT" : "UNSAT") << 
+	os << old.str() << path << ":  " << (solvable ? "SAT" : "UNSAT") <<
 		"\ntime(sec): {parse: " << parsingTime << ", to_cnf: " << 
-		cnfTime << ", solve: " << solveTime << ", total: " << (parsingTime + cnfTime + solveTime) << "}\n\n";
+		toCnfTime << ", solve: " << solveTime << ", total: " << (parsingTime + toCnfTime + solveTime) << "}\n\n";
 }
 
 int main() {
-	doOne("benchs_for_test_task/trVn_10.bench");
-	//std::cout << (21 ^ 1) << std::endl;
-	//doOne("simple.bench");
+	solveBench("benchs_for_test_task/12_13_1.bench");
 	return 0;
 }

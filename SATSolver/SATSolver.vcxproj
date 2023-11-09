@@ -133,11 +133,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="2Sat.hpp" />
+    <ClCompile Include="sat2.hpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="bench.hpp" />
     <ClInclude Include="clauses.hpp" />
     <ClInclude Include="cnf.hpp" />
     <ClInclude Include="solver.hpp" />

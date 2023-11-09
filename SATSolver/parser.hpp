@@ -1,6 +1,5 @@
 #pragma once
 
-#include "bench.hpp"
 #include "clauses.hpp"
 
 class Parser {
@@ -36,11 +35,11 @@ public:
 				size_t end = formula.find(')');
 				std::string operation = formula.substr(0, start);
 				std::string args = formula.substr(start + 1, end - start - 1);
-				std::stringstream ss(args);
-				std::string sym;
+				std::stringstream argsStream(args);
+				std::string lit;
 				std::vector<clause_ptr> operands;
-				while (std::getline(ss, sym, ',')) {
-					std::shared_ptr<Clause> operand = clauses[sym];
+				while (std::getline(argsStream, lit, ',')) {
+					std::shared_ptr<Clause> operand = clauses[lit];
 					operands.push_back(operand);
 				}
 				std::shared_ptr<Clause> result;
@@ -64,12 +63,9 @@ public:
 					result = std::make_shared<Or>(and1, and2);
 				}
 				else if (operation == "BUFF") {
-					//std::cout << "size: " << operands.size() << std::endl;
-					//std::cout << operands[0] << std::endl;
 					result = operands[0];
 				}
 				this->clauses.insert({ name, result });
-				//std::cout << "name: " << name << std::endl;
 			}
 		}
 		return clauses.at(output);
